@@ -1,5 +1,6 @@
 package me.kegantu.kegantu_spear.enchantments;
 
+import me.kegantu.kegantu_spear.weapons.Halberd;
 import me.kegantu.kegantu_spear.weapons.Spear;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentTarget;
@@ -33,7 +34,7 @@ public class MorePoisonsEnchantment extends Enchantment {
 
 	@Override
 	public boolean isAcceptableItem(ItemStack stack) {
-		return stack.getItem() instanceof Spear;
+		return stack.getItem() instanceof Halberd;
 	}
 
 	@Override

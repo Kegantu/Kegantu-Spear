@@ -4,6 +4,7 @@ import me.kegantu.kegantu_spear.enchantments.AffectMultipleTargetsEnchantment;
 import me.kegantu.kegantu_spear.enchantments.BoomEnchantment;
 import me.kegantu.kegantu_spear.enchantments.MorePoisonsEnchantment;
 import me.kegantu.kegantu_spear.entity.SpearEntity;
+import me.kegantu.kegantu_spear.weapons.Halberd;
 import me.kegantu.kegantu_spear.weapons.Spear;
 import me.kegantu.kegantu_spear.weapons.craft.SpearCraftingRecipe;
 import me.kegantu.kegantu_spear.weapons.toolMaterial.SpearMaterial;
@@ -35,6 +36,7 @@ public class KegantuSpear implements ModInitializer {
 	);
 
 	public static final Item SPEAR = new Spear(SpearMaterial.INSTANCE, 8, -2.2f, new QuiltItemSettings().rarity(Rarity.COMMON).group(ItemGroup.COMBAT));
+	public static final Item HALBERD = new Halberd(SpearMaterial.INSTANCE, 9, -2.8f, new QuiltItemSettings().rarity(Rarity.EPIC).group(ItemGroup.COMBAT));
 
 	public static final Enchantment AFFECT_MULTIPLE_TARGETS_ENCHANTMENT = new AffectMultipleTargetsEnchantment();
 
@@ -54,6 +56,7 @@ public class KegantuSpear implements ModInitializer {
 
 	public static void registerItems(){
 		Registry.register(Registry.ITEM, new Identifier(MOD_ID, "spear"), SPEAR);
+		Registry.register(Registry.ITEM, new Identifier(MOD_ID, "halberd"), HALBERD);
 	}
 
 	public static void registerEnchantments(){

@@ -1,0 +1,6 @@
+{
+  "parent": "item/handheld",
+  "textures": {
+    "layer0": "kegantu_spear:item/halberd_gui"
+  }
+}

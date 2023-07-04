@@ -4,7 +4,8 @@
 	"package": "me.kegantu.kegantu_spear.mixin",
 	"compatibilityLevel": "JAVA_17",
 	"mixins": [
-    "TridentEntityAccessor"
+    "TridentEntityAccessor",
+    "PlayerEntityMixin"
   ],
 	"client": [
     "ItemRendererMixin"

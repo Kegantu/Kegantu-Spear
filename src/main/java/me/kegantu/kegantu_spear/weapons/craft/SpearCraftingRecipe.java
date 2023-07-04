@@ -4,6 +4,7 @@ import ladysnake.pickyourpoison.common.PickYourPoison;
 import ladysnake.pickyourpoison.common.entity.PoisonDartFrogEntity;
 import ladysnake.pickyourpoison.common.item.PoisonDartFrogBowlItem;
 import me.kegantu.kegantu_spear.KegantuSpear;
+import me.kegantu.kegantu_spear.weapons.KegantuSpearItem;
 import me.kegantu.kegantu_spear.weapons.Spear;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -32,7 +33,7 @@ public class SpearCraftingRecipe extends SpecialCraftingRecipe {
 		PickYourPoison.BLUE_POISON_DART_FROG_BOWL,
 		PickYourPoison.CRIMSON_POISON_DART_FROG_BOWL);
 
-	private static final Ingredient SPEAR = Ingredient.ofItems(KegantuSpear.SPEAR);
+	private static final Ingredient SPEAR = Ingredient.ofItems(KegantuSpear.SPEAR, KegantuSpear.HALBERD);
 
 	public SpearCraftingRecipe(Identifier id) {
 		super(id);
@@ -47,10 +48,6 @@ public class SpearCraftingRecipe extends SpecialCraftingRecipe {
 				if (FROGS.test(itemStack)) {
 					for (int j = 0; j < 9; j++) {
 						if (SPEAR.test(inventory.getStack(j))){
-							if (EnchantmentHelper.getLevel(KegantuSpear.MORE_POISONS, inventory.getStack(j)) == 0){
-								return false;
-							}
-
 							return true;
 						}
 					}
@@ -63,44 +60,45 @@ public class SpearCraftingRecipe extends SpecialCraftingRecipe {
 
 	@Override
 	public ItemStack craft(CraftingInventory inventory) {
-		ItemStack spearStack = new ItemStack(KegantuSpear.SPEAR);
-		NbtCompound compound = spearStack.getOrCreateNbt();
+		ItemStack spearStack = ItemStack.EMPTY;
 		NbtList nbtList = new NbtList();
-		NbtList enchantmentsNBTList = new NbtList();
 		Set<Item> poisonFrogsSet = new HashSet<>();
 
 		for (int i = 0; i < 9; ++i) {
-			ItemStack frogStack = inventory.getStack(i);
-			if (!frogStack.isEmpty()) {
-				if (frogStack.getItem() instanceof PoisonDartFrogBowlItem poisonFrogItem){
+			ItemStack inventoryStack = inventory.getStack(i);
+			if (!inventoryStack.isEmpty()) {
+				if (inventoryStack.getItem() instanceof PoisonDartFrogBowlItem poisonFrogItem){
 					poisonFrogsSet.add(poisonFrogItem);
 				}
 
-				if (frogStack.getItem() instanceof Spear){
-					enchantmentsNBTList = frogStack.getEnchantments();
+				if (inventoryStack.getItem() instanceof KegantuSpearItem){
+					spearStack = inventoryStack.copy();
 				}
 			}
 		}
 		List<Item> poisonFrogsList = new ArrayList<>(poisonFrogsSet);
 
-		for (Item poisonFrogItem : poisonFrogsList) {
-			if (poisonFrogsList.indexOf(poisonFrogItem) >= 3){
-				continue;
-			}
-
+		if (EnchantmentHelper.getLevel(KegantuSpear.MORE_POISONS, spearStack) <= 0){
 			NbtCompound nbtCompound = new NbtCompound();
-			StatusEffectInstance statusEffectInstance = new StatusEffectInstance(PoisonDartFrogEntity.getFrogPoisonEffect(getFrogType(poisonFrogItem)));
+			StatusEffectInstance statusEffectInstance = new StatusEffectInstance(PoisonDartFrogEntity.getFrogPoisonEffect(getFrogType(poisonFrogsList.get(0))));
 			statusEffectInstance.writeNbt(nbtCompound);
 			nbtList.add(nbtCompound);
 		}
+		else if (EnchantmentHelper.getLevel(KegantuSpear.MORE_POISONS, spearStack) > 0){
+			for (Item poisonFrogItem : poisonFrogsList) {
+				if (poisonFrogsList.indexOf(poisonFrogItem) >= 3){
+					continue;
+				}
+
+				NbtCompound nbtCompound = new NbtCompound();
+				StatusEffectInstance statusEffectInstance = new StatusEffectInstance(PoisonDartFrogEntity.getFrogPoisonEffect(getFrogType(poisonFrogItem)));
+				statusEffectInstance.writeNbt(nbtCompound);
+				nbtList.add(nbtCompound);
+			}
+		}
+		NbtCompound compound = spearStack.getOrCreateNbt();
 
 		compound.put("poisons", nbtList);
-		Map<Enchantment, Integer> enchantments = EnchantmentHelper.fromNbt(enchantmentsNBTList);
-
-		for (Map.Entry<Enchantment, Integer> enchantment : enchantments.entrySet()) {
-			spearStack.addEnchantment(enchantment.getKey(), enchantment.getValue());
-		}
-
 
 		return spearStack;
 	}

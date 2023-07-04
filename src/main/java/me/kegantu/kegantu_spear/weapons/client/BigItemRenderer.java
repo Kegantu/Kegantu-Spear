@@ -1,5 +1,6 @@
 package me.kegantu.kegantu_spear.weapons.client;
 
+import me.kegantu.kegantu_spear.weapons.KegantuSpearItem;
 import me.kegantu.kegantu_spear.weapons.Spear;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.minecraft.client.MinecraftClient;
@@ -19,18 +20,18 @@ import org.quiltmc.qsl.resource.loader.api.reloader.IdentifiableResourceReloader
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
-public class SpearItemRenderer implements BuiltinItemRendererRegistry.DynamicItemRenderer, IdentifiableResourceReloader {
+public class BigItemRenderer implements BuiltinItemRendererRegistry.DynamicItemRenderer, IdentifiableResourceReloader {
 
     private final Identifier id;
-    private final Identifier spearId;
+    private final Identifier itemId;
     private ItemRenderer itemRenderer;
     private BakedModel inventorySpearModel;
     private BakedModel worldSpearModel;
 	private BakedModel worldUsingSpearModel;
 
-    public SpearItemRenderer(Identifier id){
+    public BigItemRenderer(Identifier id){
 		this.id = new Identifier(id.getNamespace(), id.getPath() + "_renderer");
-		this.spearId = id;
+		this.itemId = id;
     }
 
     @Override
@@ -47,7 +48,7 @@ public class SpearItemRenderer implements BuiltinItemRendererRegistry.DynamicIte
                 default -> leftHanded = false;
             }
 
-			if (stack.getItem() instanceof Spear){
+			if (stack.getItem() instanceof KegantuSpearItem){
 				final MinecraftClient client = MinecraftClient.getInstance();
 				if (client.player != null){
 					if (client.player.isUsingItem()){
@@ -78,9 +79,9 @@ public class SpearItemRenderer implements BuiltinItemRendererRegistry.DynamicIte
 			applyProfiler.push("listener");
 			final MinecraftClient client = MinecraftClient.getInstance();
 			this.itemRenderer = client.getItemRenderer();
-			this.inventorySpearModel = client.getBakedModelManager().getModel(new ModelIdentifier( this.spearId + "_gui", "inventory"));
-			this.worldSpearModel = client.getBakedModelManager().getModel(new ModelIdentifier( this.spearId + "_handheld", "inventory"));
-			this.worldUsingSpearModel = client.getBakedModelManager().getModel(new ModelIdentifier(this.spearId + "_throwing", "inventory"));
+			this.inventorySpearModel = client.getBakedModelManager().getModel(new ModelIdentifier( this.itemId + "_gui", "inventory"));
+			this.worldSpearModel = client.getBakedModelManager().getModel(new ModelIdentifier( this.itemId + "_handheld", "inventory"));
+			this.worldUsingSpearModel = client.getBakedModelManager().getModel(new ModelIdentifier(this.itemId + "_throwing", "inventory"));
 			applyProfiler.pop();
 			applyProfiler.endTick();
 		}, applyExecutor);

@@ -1,0 +1,84 @@
+{
+  "parent": "item/handheld",
+  "textures": {
+    "layer0": "kegantu_spear:item/halberd_handheld"
+  },
+  "display": {
+    "thirdperson_righthand": {
+      "rotation": [
+        55,
+        90,
+        0
+      ],
+      "translation": [
+        0,
+        7,
+        3
+      ],
+      "scale": [
+        1.6,
+        1.6,
+        1.6
+      ]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [
+        0,
+        90,
+        -55
+      ],
+      "translation": [
+        0,
+        5,
+        0.5
+      ],
+      "scale": [
+        1.6,
+        1.6,
+        1.6
+      ]
+    },
+    "firstperson_righthand": {
+      "rotation": [
+        30,
+        90,
+        0
+      ],
+      "translation": [
+        1.13,
+        5,
+        1.13
+      ],
+      "scale": [
+        1.1,
+        1.1,
+        1.1
+      ]
+    },
+    "firstperson_lefthand": {
+      "rotation": [
+        -25,
+        90,
+        -25
+      ],
+      "translation": [
+        1.13,
+        5,
+        1.13
+      ],
+      "scale": [
+        1.1,
+        1.1,
+        1.1
+      ]
+    },
+    "overrides": [
+      {
+        "predicate": {
+          "throwing_spear": 1
+        },
+        "model": "kegantu_spear:item/halberd_throwing"
+      }
+    ]
+  }
+}
