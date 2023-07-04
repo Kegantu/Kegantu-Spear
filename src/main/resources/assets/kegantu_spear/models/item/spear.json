@@ -1,0 +1,14 @@
+{
+  "parent": "item/handheld",
+  "base": {
+    "parent": "kegantu_spear:item/spear_handheld"
+  },
+  "perspectives": {
+    "gui": {
+      "parent": "kegantu_spear:item/spear_gui"
+    },
+    "fixed": {
+      "parent": "kegantu_spear:item/spear_gui"
+    }
+  }
+}
