@@ -1,7 +1,9 @@
 package me.kegantu.kegantu_spear.weapons;
 
+import me.kegantu.kegantu_spear.Interface.IKegantuSpearItem;
 import me.kegantu.kegantu_spear.KegantuSpear;
 import me.kegantu.kegantu_spear.entity.SpearEntity;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MovementType;
@@ -12,6 +14,7 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.SwordItem;
 import net.minecraft.item.ToolMaterial;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -20,45 +23,57 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.stat.Stats;
+import net.minecraft.text.Text;
+import net.minecraft.util.Hand;
+import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.UseAction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.quiltmc.loader.api.QuiltLoader;
 
+import java.util.List;
 import java.util.Objects;
 
-public class Halberd extends KegantuSpearItem {
+public class Halberd extends SwordItem implements IKegantuSpearItem {
 
 	public Halberd(ToolMaterial material, int attackDamage, float attackSpeed, Settings settings) {
 		super(material, attackDamage, attackSpeed, settings);
 	}
 
-	/*@Override
+	@Override
 	public boolean postHit(ItemStack stack, LivingEntity target, LivingEntity attacker) {
-		PlayerEntity player = (PlayerEntity) attacker;
-		float genericAttackDamage = (float) player.getAttributeValue(EntityAttributes.GENERIC_ATTACK_DAMAGE);
-		if (!player.isOnGround()){
-			return super.postHit(stack, target, attacker);
-		}
-
-		float sweepingMultiplier = 1.0F + EnchantmentHelper.getSweepingMultiplier(attacker) * genericAttackDamage;
-
-		for(LivingEntity livingEntity : target.world.getNonSpectatingEntities(LivingEntity.class, target.getBoundingBox().expand(1.0, 0.25, 1.0))) {
-			if (livingEntity != attacker
-				&& !attacker.isTeammate(livingEntity)
-				&& (!(livingEntity instanceof ArmorStandEntity) || !((ArmorStandEntity)livingEntity).isMarker())
-				&& attacker.squaredDistanceTo(livingEntity) < 9.0) {
-				livingEntity.takeKnockback(
-					0.4F, MathHelper.sin(player.getYaw() * (float) (Math.PI / 180.0)), (double)(-MathHelper.cos(player.getYaw() * (float) (Math.PI / 180.0)))
-				);
-				livingEntity.damage(DamageSource.player(player), sweepingMultiplier);
+		if (QuiltLoader.isModLoaded("pickyourpoison")) {
+			NbtCompound nbtCompound = stack.getNbt();
+			NbtElement element = nbtCompound.get("poisons");
+			NbtList list = (NbtList) element;
+			if (list != null){
+				for (NbtElement nbtElement : list) {
+					StatusEffectInstance statusEffectInstance = new StatusEffectInstance(Objects.requireNonNull(StatusEffectInstance.fromNbt((NbtCompound) nbtElement)));
+					target.addStatusEffect(statusEffectInstance, attacker);
+				}
 			}
-		}
+			/*if (EnchantmentHelper.getLevel(KegantuSpear.affectMultipleTargetsEnchantment, stack) > 0){
+				PlayerEntity player = (PlayerEntity) attacker;
+				if (!player.isOnGround()){
+					return super.postHit(stack, target, attacker);
+				}
 
-		player.world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP, player.getSoundCategory(), 1.0F, 1.0F);
-		player.spawnSweepAttackParticles();
+				for(LivingEntity livingEntity : target.world.getNonSpectatingEntities(LivingEntity.class, target.getBoundingBox().expand(1.0, 0.25, 1.0))) {
+					if (livingEntity != attacker
+						&& !attacker.isTeammate(livingEntity)
+						&& (!(livingEntity instanceof ArmorStandEntity) || !((ArmorStandEntity)livingEntity).isMarker())
+						&& attacker.squaredDistanceTo(livingEntity) < 9.0) {
+						StatusEffectInstance statusEffect2 = new StatusEffectInstance(statusEffectInstance.getEffectType(), statusEffectInstance.getDuration() / 2);
+						livingEntity.addStatusEffect(statusEffect2, attacker);
+					}
+				}
+			}*/
+		}
 		return super.postHit(stack, target, attacker);
-	}*/
+	}
 
 	@Override
 	public void onStoppedUsing(ItemStack stack, World world, LivingEntity user, int remainingUseTicks) {
@@ -126,5 +141,37 @@ public class Halberd extends KegantuSpearItem {
 		spearEntity.setProperties(user, user.getPitch(), user.getYaw(), 0.0F, 2.5F, 1.0F);
 		spearEntity.updatePosition(user.getX(), user.getEyeY() - 0.1, user.getZ());
 		return spearEntity;
+	}
+
+	@Override
+	public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
+		if (QuiltLoader.isModLoaded("pickyourpoison")) {
+			buildTooltip(tooltip, 1.0f, stack);
+		}
+	}
+
+	@Override
+	public int getEnchantability() {
+		return 1;
+	}
+
+	@Override
+	public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+		ItemStack itemStack = user.getStackInHand(hand);
+		if (itemStack.getDamage() >= itemStack.getMaxDamage() - 1) {
+			return TypedActionResult.fail(itemStack);
+		}
+		user.setCurrentHand(hand);
+		return TypedActionResult.consume(itemStack);
+	}
+
+	@Override
+	public UseAction getUseAction(ItemStack stack) {
+		return UseAction.SPEAR;
+	}
+
+	@Override
+	public int getMaxUseTime(ItemStack stack) {
+		return 72000;
 	}
 }

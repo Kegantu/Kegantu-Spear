@@ -3,10 +3,8 @@ package me.kegantu.kegantu_spear.weapons.craft;
 import ladysnake.pickyourpoison.common.PickYourPoison;
 import ladysnake.pickyourpoison.common.entity.PoisonDartFrogEntity;
 import ladysnake.pickyourpoison.common.item.PoisonDartFrogBowlItem;
+import me.kegantu.kegantu_spear.Interface.IKegantuSpearItem;
 import me.kegantu.kegantu_spear.KegantuSpear;
-import me.kegantu.kegantu_spear.weapons.KegantuSpearItem;
-import me.kegantu.kegantu_spear.weapons.Spear;
-import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.inventory.CraftingInventory;
@@ -71,7 +69,7 @@ public class SpearCraftingRecipe extends SpecialCraftingRecipe {
 					poisonFrogsSet.add(poisonFrogItem);
 				}
 
-				if (inventoryStack.getItem() instanceof KegantuSpearItem){
+				if (inventoryStack.getItem() instanceof IKegantuSpearItem){
 					spearStack = inventoryStack.copy();
 				}
 			}

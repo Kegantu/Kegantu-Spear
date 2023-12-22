@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import ladysnake.pickyourpoison.common.PickYourPoison;
+import me.kegantu.kegantu_spear.Interface.IKegantuSpearItem;
 import me.kegantu.kegantu_spear.KegantuSpear;
 import me.kegantu.kegantu_spear.entity.SpearEntity;
 import net.minecraft.block.BlockState;
@@ -45,9 +46,24 @@ import org.quiltmc.loader.api.QuiltLoader;
 
 import java.util.*;
 
-public class Spear extends KegantuSpearItem {
+public class Spear extends ToolItem implements IKegantuSpearItem {
+
+	private final int attackDamage;
+	private final Multimap<EntityAttribute, EntityAttributeModifier> attributeModifiers;
+
 	public Spear(ToolMaterial toolMaterial, int attackDamage, float attackSpeed, Settings settings) {
-		super(toolMaterial, attackDamage, attackSpeed, settings);
+		super(toolMaterial, settings);
+		this.attackDamage = attackDamage;
+		ImmutableMultimap.Builder<EntityAttribute, EntityAttributeModifier> builder = ImmutableMultimap.builder();
+		builder.put(
+			EntityAttributes.GENERIC_ATTACK_DAMAGE,
+			new EntityAttributeModifier(ATTACK_DAMAGE_MODIFIER_ID, "Weapon modifier", this.attackDamage, EntityAttributeModifier.Operation.ADDITION)
+		);
+		builder.put(
+			EntityAttributes.GENERIC_ATTACK_SPEED,
+			new EntityAttributeModifier(ATTACK_SPEED_MODIFIER_ID, "Weapon modifier", attackSpeed, EntityAttributeModifier.Operation.ADDITION)
+		);
+		this.attributeModifiers = builder.build();
 	}
 
 	public static StatusEffectInstance getDartPoisonEffect(Item item) {
@@ -68,6 +84,40 @@ public class Spear extends KegantuSpearItem {
 		}
 
 		return null;
+	}
+
+	@Override
+	public Multimap<EntityAttribute, EntityAttributeModifier> getAttributeModifiers(EquipmentSlot slot) {
+		return slot == EquipmentSlot.MAINHAND ? this.attributeModifiers : super.getAttributeModifiers(slot);
+	}
+
+	@Override
+	public boolean postMine(ItemStack stack, World world, BlockState state, BlockPos pos, LivingEntity miner) {
+		if (state.getHardness(world, pos) != 0.0F) {
+			stack.damage(2, miner, e -> e.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND));
+		}
+
+		return super.postMine(stack, world, state, pos, miner);
+	}
+
+	@Override
+	public boolean isSuitableFor(BlockState state) {
+		return state.isOf(Blocks.COBWEB);
+	}
+
+	@Override
+	public boolean canMine(BlockState state, World world, BlockPos pos, PlayerEntity miner) {
+		return !miner.isCreative();
+	}
+
+	@Override
+	public float getMiningSpeedMultiplier(ItemStack stack, BlockState state) {
+		if (state.isOf(Blocks.COBWEB)) {
+			return 15.0F;
+		} else {
+			Material material = state.getMaterial();
+			return material != Material.PLANT && material != Material.REPLACEABLE_PLANT && !state.isIn(BlockTags.LEAVES) && material != Material.GOURD ? 1.0F : 1.5F;
+		}
 	}
 
 	@Override
@@ -99,6 +149,7 @@ public class Spear extends KegantuSpearItem {
 				}
 			}*/
 		}
+		stack.damage(1, attacker, e -> e.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND));
 		return super.postHit(stack, target, attacker);
 	}
 
@@ -168,5 +219,37 @@ public class Spear extends KegantuSpearItem {
 		spearEntity.setProperties(user, user.getPitch(), user.getYaw(), 0.0F, 2.5F, 1.0F);
 		spearEntity.updatePosition(user.getX(), user.getEyeY() - 0.1, user.getZ());
 		return spearEntity;
+	}
+
+	@Override
+	public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
+		if (QuiltLoader.isModLoaded("pickyourpoison")) {
+			buildTooltip(tooltip, 1.0f, stack);
+		}
+	}
+
+	@Override
+	public int getEnchantability() {
+		return 1;
+	}
+
+	@Override
+	public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+		ItemStack itemStack = user.getStackInHand(hand);
+		if (itemStack.getDamage() >= itemStack.getMaxDamage() - 1) {
+			return TypedActionResult.fail(itemStack);
+		}
+		user.setCurrentHand(hand);
+		return TypedActionResult.consume(itemStack);
+	}
+
+	@Override
+	public UseAction getUseAction(ItemStack stack) {
+		return UseAction.SPEAR;
+	}
+
+	@Override
+	public int getMaxUseTime(ItemStack stack) {
+		return 72000;
 	}
 }

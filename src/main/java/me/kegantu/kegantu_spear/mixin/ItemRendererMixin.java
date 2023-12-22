@@ -1,7 +1,6 @@
 package me.kegantu.kegantu_spear.mixin;
 
-import me.kegantu.kegantu_spear.weapons.KegantuSpearItem;
-import me.kegantu.kegantu_spear.weapons.Spear;
+import me.kegantu.kegantu_spear.Interface.IKegantuSpearItem;
 import net.minecraft.client.render.item.ItemModels;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.BakedModel;
@@ -25,7 +24,7 @@ final class ItemRendererMixin {
 
 	@Inject(method = "getHeldItemModel", at = @At("HEAD"), cancellable = true)
 	private void malum$getHeldItemModel(ItemStack stack, World world, LivingEntity entity, int seed, CallbackInfoReturnable<BakedModel> cir) {
-		if (stack.getItem() instanceof KegantuSpearItem) {
+		if (stack.getItem() instanceof IKegantuSpearItem) {
 			BakedModel bakedModel = models.getModelManager().getModel(new ModelIdentifier("minecraft", "trident_in_hand", "inventory"));// this is the model type (not the texture), its insane that copy-pasting this works first try
 			ClientWorld clientWorld = world instanceof ClientWorld ? (ClientWorld) world : null;
 			BakedModel bakedModel2 = bakedModel.getOverrides().apply(bakedModel, stack, clientWorld, entity, seed);

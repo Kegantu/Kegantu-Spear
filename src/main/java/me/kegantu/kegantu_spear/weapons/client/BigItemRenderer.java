@@ -1,7 +1,6 @@
 package me.kegantu.kegantu_spear.weapons.client;
 
-import me.kegantu.kegantu_spear.weapons.KegantuSpearItem;
-import me.kegantu.kegantu_spear.weapons.Spear;
+import me.kegantu.kegantu_spear.Interface.IKegantuSpearItem;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -48,7 +47,7 @@ public class BigItemRenderer implements BuiltinItemRendererRegistry.DynamicItemR
                 default -> leftHanded = false;
             }
 
-			if (stack.getItem() instanceof KegantuSpearItem){
+			if (stack.getItem() instanceof IKegantuSpearItem){
 				final MinecraftClient client = MinecraftClient.getInstance();
 				if (client.player != null){
 					if (client.player.isUsingItem()){
